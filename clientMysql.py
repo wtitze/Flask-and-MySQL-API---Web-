@@ -4,6 +4,13 @@ import mysql.connector
 # andarli a prendere da colab
 # problema dei secrets su github
 
+db_config = {
+  'host':"mysql-9b7d77c-iisgalvanimi-49c1.h.aivencloud.com",
+  'user':"avnadmin",
+
+  'database':"scuola",
+  'port':16723
+}
 
 def execute_query(query):
     try:
