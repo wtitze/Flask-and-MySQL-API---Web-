@@ -7,7 +7,7 @@ import mysql.connector
 db_config = {
   'host':"mysql-9b7d77c-iisgalvanimi-49c1.h.aivencloud.com",
   'user':"avnadmin",
-  'password':'xxx'
+  'password':'AVNS_OWIWxR0i8HafJ6xQLmZ',
   'database':"scuola",
   'port':16723
 }
