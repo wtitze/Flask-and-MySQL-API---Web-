@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 import mysql.connector
 
 app = Flask(__name__)
@@ -31,7 +31,11 @@ def get_data():
     
     cursor.close()
     conn.close()
-    return jsonify(rows)
+    return jsonify(rows), 200, {'Content-Type': 'application/json'}
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
