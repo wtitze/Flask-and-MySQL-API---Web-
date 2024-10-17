@@ -89,7 +89,7 @@ def get_user_purchases(customer_id):
 
     # Supponiamo che le tabelle Orders e OrderDetails siano strutturate con relazioni a Users e Products
     query = """
-        SELECT Products.ProductID, Products.ProductName, Products.Price
+        SELECT Orders.OrderID, Products.ProductName, Products.Price
         FROM Orders
         JOIN Order_details ON Orders.OrderID = Order_details.OrderID
         JOIN Products ON Order_details.ProductID = Products.ProductID
@@ -104,6 +104,7 @@ def get_user_purchases(customer_id):
         return jsonify(purchases), 200
     else:
         return jsonify({"error": "Nessun acquisto trovato per l'utente"}), 404
+
 @app.route('/api/customer/<int:customer_id>', methods=['GET'])
 def get_customer_by_id(customer_id):
     conn = get_db_connection()
@@ -119,6 +120,31 @@ def get_customer_by_id(customer_id):
         return jsonify(customer), 200
     else:
         return jsonify({"error": "Cliente non trovato"}), 404
+
+@app.route('/api/product/<product_id>/customers', methods=['GET'])
+def get_customers_by_product(product_id):
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    try:
+        # Supponendo che ci sia una tabella di acquisti con riferimento a prodotto e cliente
+        cursor.execute("""
+            SELECT DISTINCT c.*
+            FROM Customers c
+            JOIN Orders o ON c.CustomerID = o.CustomerID
+            JOIN Order_details od ON o.OrderID = od.OrderID
+            WHERE od.ProductID = %s
+        """, (product_id,))
+        
+        customers = cursor.fetchall()
+    except mysql.connector.Error as err:
+        customers = {'error': str(err)}
+    finally:
+        cursor.close()
+        connection.close()
+
+    return jsonify(customers)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
