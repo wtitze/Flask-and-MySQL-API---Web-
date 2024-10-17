@@ -104,6 +104,21 @@ def get_user_purchases(customer_id):
         return jsonify(purchases), 200
     else:
         return jsonify({"error": "Nessun acquisto trovato per l'utente"}), 404
+@app.route('/api/customer/<int:customer_id>', methods=['GET'])
+def get_customer_by_id(customer_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    query = "SELECT * FROM Customers WHERE CustomerID = %s"
+    cursor.execute(query, (customer_id,))
+    customer = cursor.fetchone()  # Preleva una singola riga corrispondente all'ID
+    cursor.close()
+    conn.close()
+
+    if customer:
+        return jsonify(customer), 200
+    else:
+        return jsonify({"error": "Cliente non trovato"}), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
