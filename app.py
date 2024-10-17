@@ -20,11 +20,6 @@ def get_data():
     
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)  # Restituisce righe come dizionari
-    
-    # Prevenire l'SQL Injection controllando il nome della tabella
-    valid_tables = ['Customers', 'Products', 'Orders', 'Categories']  # Aggiungi qui le tue tabelle valide
-    if table_name not in valid_tables:
-        return jsonify({"error": "Invalid table name"}), 400
 
     cursor.execute(f'SELECT * FROM {table_name}')
     rows = cursor.fetchall()
@@ -32,6 +27,42 @@ def get_data():
     cursor.close()
     conn.close()
     return jsonify(rows), 200, {'Content-Type': 'application/json'}
+
+@app.route('/api/tables', methods=['GET'])
+def get_tables():
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("SHOW TABLES")
+    
+    tables = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    connection.close()
+    
+    return jsonify(tables)
+
+@app.route('/api/execute', methods=['POST'])
+def execute_query():
+    query = request.json.get('query', '')  # Prendi la query dal corpo della richiesta
+    if not query:  # Se la query è vuota
+        return jsonify({"error": "La query SQL non può essere vuota"}), 400
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    try:
+        cursor.execute(query)
+        if cursor.description:  # Se è una SELECT o query che restituisce dati
+            results = cursor.fetchall()
+        else:  # Per operazioni che non restituiscono dati (INSERT, UPDATE, DELETE)
+            connection.commit()
+            results = {'status': 'Query eseguita con successo'}
+    except mysql.connector.Error as err:
+        results = {'error': str(err)}
+    finally:
+        cursor.close()
+        connection.close()
+    
+    return jsonify(results)  # Assicurati che venga sempre restituito un oggetto JSON
 
 @app.route('/')
 def index():

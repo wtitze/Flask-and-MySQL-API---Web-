@@ -17,17 +17,22 @@
         th {
             background-color: #f2f2f2;
         }
+        textarea {
+            width: 100%;
+            height: 100px;
+        }
     </style>
 </head>
 <body>
     <h1>Visualizzazione Dati</h1>
-    <select id="tableSelect">
-        <option value="Customers">Customers</option>
-        <option value="Products">Products</option>
-        <option value="Orders">Orders</option>
-        <option value="Categories">Categories</option>
-    </select>
+
+    <select id="tableSelect"></select>
     <button id="loadData">Carica Dati</button>
+
+    <h2>Esegui Query SQL</h2>
+    <textarea id="sqlQuery" placeholder="Inserisci la tua query SQL qui"></textarea>
+    <button id="executeQuery">Esegui Query</button>
+
     <table id="dataTable">
         <thead>
             <tr id="tableHeader"></tr>
@@ -36,12 +41,38 @@
     </table>
 
     <script>
-        document.getElementById('loadData').onclick = function() {
+        // Funzione per caricare i nomi delle tabelle
+        function loadTables() {
+            fetch('/api/tables')
+                .then(response => response.json())
+                .then(tables => {
+                    const tableSelect = document.getElementById('tableSelect');
+                    
+                    // Pulisci eventuali opzioni esistenti
+                    tableSelect.innerHTML = '';
+                    
+                    // Aggiungi le nuove opzioni
+                    tables.forEach(table => {
+                        const option = document.createElement('option');
+                        option.value = table;
+                        option.textContent = table;
+                        tableSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Errore:', error));
+        }
+
+        // Chiamata alla funzione loadTables al caricamento della pagina
+        window.onload = loadTables;
+
+        document.getElementById('loadData').onclick = function(event) {
+            event.preventDefault();  // Impedisce il comportamento predefinito del bottone
             const tableName = document.getElementById('tableSelect').value;
-            fetch('/api/data?table='+tableName)
+            
+            fetch('/api/data?table=' + tableName)
                 .then(response => response.json())
                 .then(data => { 
-                    print('ecco i dati: ', data)
+                    console.log('Ecco i dati: ', data); // Debug in console
                     const header = document.getElementById('tableHeader');
                     const body = document.getElementById('tableBody');
 
@@ -75,6 +106,56 @@
                     });
                 })
                 .catch(error => console.error('Errore:', error));
+        };
+
+        // Funzione per eseguire la query SQL
+        document.getElementById('executeQuery').onclick = function(event) {
+            event.preventDefault();
+            const sqlQuery = document.getElementById('sqlQuery').value;
+
+            fetch('/api/execute', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query: sqlQuery })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Risultato query SQL: ', data);
+                const header = document.getElementById('tableHeader');
+                const body = document.getElementById('tableBody');
+
+                // Pulisci i dati precedenti
+                header.innerHTML = '';
+                body.innerHTML = '';
+
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                // Creare l'intestazione della tabella
+                if (data.length > 0) {
+                    Object.keys(data[0]).forEach(key => {
+                        const th = document.createElement('th');
+                        th.textContent = key;
+                        header.appendChild(th);
+                    });
+                }
+
+                // Aggiungere i dati alla tabella
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    Object.values(row).forEach(value => {
+                        const td = document.createElement('td');
+                        td.textContent = value;
+                        tr.appendChild(td);
+                    });
+                    body.appendChild(tr);
+                });
+            })
+            .catch(error => console.error('Errore:', error));
         };
     </script>
 </body>
