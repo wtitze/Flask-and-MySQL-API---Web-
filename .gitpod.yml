@@ -7,4 +7,17 @@
 tasks:
   - init: pip install -r requirements.txt
 
+  - name: "API Server"
+    command: python3 api_server.py
+
+  - name: "Web Server"
+    command: python3 web_server.py  
+
+ports:
+  - port: 5000  # Porta per il server Flask API
+    onOpen: open-preview
+
+  - port: 8080  # Porta per il server web
+    onOpen: open-preview
+
 

@@ -43,7 +43,7 @@
     <script>
         // Funzione per caricare i nomi delle tabelle
         function loadTables() {
-            fetch('/api/tables')
+            fetch('https://5000-wtitze-mysql-exjbbfcaqed.ws-eu116.gitpod.io/api/tables')
                 .then(response => response.json())
                 .then(tables => {
                     const tableSelect = document.getElementById('tableSelect');
@@ -69,7 +69,7 @@
             event.preventDefault();  // Impedisce il comportamento predefinito del bottone
             const tableName = document.getElementById('tableSelect').value;
             
-            fetch('/api/data?table=' + tableName)
+            fetch('https://5000-wtitze-mysql-exjbbfcaqed.ws-eu116.gitpod.io/api/data?table=' + tableName)
                 .then(response => response.json())
                 .then(data => { 
                     console.log('Ecco i dati: ', data); // Debug in console
@@ -113,7 +113,7 @@
             event.preventDefault();
             const sqlQuery = document.getElementById('sqlQuery').value;
 
-            fetch('/api/execute', {
+            fetch('https://5000-wtitze-mysql-exjbbfcaqed.ws-eu116.gitpod.io/api/execute', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
