@@ -4,6 +4,9 @@
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
+/*  istruzioni SQL per la creazione del database di w3schools 
+    su un server mysql (host aiven.io)
+*/
 -- --------------------------------------------------------
 CREATE DATABASE W3Schools;
 USE W3Schools;
