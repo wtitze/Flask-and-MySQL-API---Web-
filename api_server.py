@@ -66,6 +66,44 @@ def execute_query():
     
     return jsonify(results)  # Assicurati che venga sempre restituito un oggetto JSON
 
+@app.route('/api/product/<int:product_id>', methods=['GET'])
+def get_product_by_id(product_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    query = "SELECT * FROM Products WHERE ProductID = %s"
+    cursor.execute(query, (product_id,))
+    product = cursor.fetchone()  # Preleva una singola riga corrispondente all'ID
+    cursor.close()
+    conn.close()
+
+    if product:
+        return jsonify(product), 200
+    else:
+        return jsonify({"error": "Prodotto non trovato"}), 404
+
+@app.route('/api/customer/<int:customer_id>/purchases', methods=['GET'])
+def get_user_purchases(customer_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Supponiamo che le tabelle Orders e OrderDetails siano strutturate con relazioni a Users e Products
+    query = """
+        SELECT Products.ProductID, Products.ProductName, Products.Price
+        FROM Orders
+        JOIN Order_details ON Orders.OrderID = Order_details.OrderID
+        JOIN Products ON Order_details.ProductID = Products.ProductID
+        WHERE Orders.CustomerID = %s
+    """
+    cursor.execute(query, (customer_id,))
+    purchases = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    if purchases:
+        return jsonify(purchases), 200
+    else:
+        return jsonify({"error": "Nessun acquisto trovato per l'utente"}), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
