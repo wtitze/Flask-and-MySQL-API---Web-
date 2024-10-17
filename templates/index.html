@@ -43,7 +43,12 @@
     <script>
         // Funzione per caricare i nomi delle tabelle
         function loadTables() {
-            fetch('https://5000-wtitze-mysql-exjbbfcaqed.ws-eu116.gitpod.io/api/tables')
+            // Ottieni l'hostname corrente
+            const hostname = window.location.hostname;
+
+            // Sostituisci la porta web con quella dell'API (porta 5000)
+            const apiBaseUrl = `https://5000-${hostname.substring(hostname.indexOf('-') + 1)}`;
+            fetch(apiBaseUrl + '/api/tables')
                 .then(response => response.json())
                 .then(tables => {
                     const tableSelect = document.getElementById('tableSelect');
@@ -68,8 +73,10 @@
         document.getElementById('loadData').onclick = function(event) {
             event.preventDefault();  // Impedisce il comportamento predefinito del bottone
             const tableName = document.getElementById('tableSelect').value;
-            
-            fetch('https://5000-wtitze-mysql-exjbbfcaqed.ws-eu116.gitpod.io/api/data?table=' + tableName)
+
+            const hostname = window.location.hostname;
+            const apiBaseUrl = `https://5000-${hostname.substring(hostname.indexOf('-') + 1)}`;
+            fetch(apiBaseUrl + '/api/data?table=' + tableName)
                 .then(response => response.json())
                 .then(data => { 
                     console.log('Ecco i dati: ', data); // Debug in console
@@ -113,7 +120,9 @@
             event.preventDefault();
             const sqlQuery = document.getElementById('sqlQuery').value;
 
-            fetch('https://5000-wtitze-mysql-exjbbfcaqed.ws-eu116.gitpod.io/api/execute', {
+            const hostname = window.location.hostname;
+            const apiBaseUrl = `https://5000-${hostname.substring(hostname.indexOf('-') + 1)}`;
+            fetch(apiBaseUrl + '/api/execute', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
