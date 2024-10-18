@@ -18,6 +18,42 @@ def get_db_connection():
 
 @app.route('/api/data', methods=['GET'])
 def get_data():
+    
+    """
+    Restituisce il contenuto di una tabella passata come parametro
+    ---
+    parameters:
+      - name: table
+        in: query
+        type: string
+        required: true
+        description: Il nome della tabella da visualizzare
+    responses:
+      200:
+        description: Restituisce il contenuto di una tabella
+        schema:
+          type: object
+          properties:
+            tabella:
+              type: json
+              example: [
+                    {
+                        "Phone": "(503) 555-9831",
+                        "ShipperID": 1,
+                        "ShipperName": "Speedy Express"
+                    },
+                    {
+                        "Phone": "(503) 555-3199",
+                        "ShipperID": 2,
+                        "ShipperName": "United Package"
+                    },
+                    {
+                        "Phone": "(503) 555-9931",
+                        "ShipperID": 3,
+                        "ShipperName": "Federal Shipping"
+                    }
+                ]
+    """
     table_name = request.args.get('table')
     if not table_name:
         return jsonify({"error": "Missing table parameter"}), 400
@@ -39,13 +75,22 @@ def get_tables():
     ---
     responses:
       200:
-        description: abelle del database
+        description: tabelle del database
         schema:
           type: object
           properties:
             message:
               type: string
-              example: "Hello, World!"
+              example: "[
+                    'Categories',
+                    'Customers',
+                    'Employees',
+                    'Order_details',
+                    'Orders',
+                    'Products',
+                    'Shippers',
+                    'Suppliers'
+                ]"
     """
     connection = get_db_connection()
     cursor = connection.cursor()
