@@ -1,9 +1,11 @@
 from flask import Flask, jsonify, request, render_template
 import mysql.connector
 from flask_cors import CORS
+from flasgger import Swagger
 
 app = Flask(__name__)
 CORS(app) 
+swagger = Swagger(app)
 
 def get_db_connection():
     return mysql.connector.connect(
@@ -32,6 +34,19 @@ def get_data():
 
 @app.route('/api/tables', methods=['GET'])
 def get_tables():
+    """
+    Un endpoint per restituire le tabelle del database
+    ---
+    responses:
+      200:
+        description: abelle del database
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Hello, World!"
+    """
     connection = get_db_connection()
     cursor = connection.cursor()
     cursor.execute("SHOW TABLES")
